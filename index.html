@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Daily Quest 🌟</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffe6e6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ff80ab;
+            font-size: 24px;
+        }
+        .scoreboard {
+            background: #ff80ab;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .quest-list {
+            list-style: none;
+            padding: 0;
+        }
+        .quest-item {
+            background: #fff0f5;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+        .quest-item.done {
+            background: #e8f5e9;
+            border-color: #81c784;
+            opacity: 0.7;
+        }
+        .quest-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #d81b60;
+        }
+        .quest-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-done {
+            background: #81c784;
+            color: white;
+        }
+        .btn-pass {
+            background: #e0e0e0;
+            color: #757575;
+        }
+        .reset-btn {
+            width: 100%;
+            background: #ffb74d;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎮 Misi Harian Kita 🌟</h1>
+    
+    <div class="scoreboard">
+        Poin Kamu: <span id="score">0</span> 🏆
+    </div>
+
+    <ul class="quest-list" id="quests">
+        <!-- Misi akan diisi lewat JavaScript -->
+    </ul>
+
+    <button class="reset-btn" onclick="resetGame()">🔄 Reset Misi Besok</button>
+</div>
+
+<script>
+    // Daftar Misi
+    const quests = [
+        { id: 1, title: "Dzikir & Murottal 🎧", desc: "Tenangin hati 5 menit aja", points: 10 },
+        { id: 2, title: "Stay Hydrated! 💧", desc: "Minum segelas air putih sekarang", points: 5 },
+        { id: 3, title: "Kirim Foto Random 📸", desc: "Share foto langit/kucing ke aku", points: 10 },
+        { id: 4, title: "No Overthinking Zone 🛑", desc: "Nonton 1 video lucu di TikTok/IG", points: 15 }
+    ];
+
+    let score = localStorage.getItem('coupleScore') ? parseInt(localStorage.getItem('coupleScore')) : 0;
+    
+    function renderQuests() {
+        document.getElementById('score').innerText = score;
+        const list = document.getElementById('quests');
+        list.innerHTML = '';
+
+        quests.forEach(q => {
+            const isDone = localStorage.getItem(`quest_${q.id}`);
+            const div = document.createElement('li');
+            div.className = `quest-item ${isDone ? 'done' : ''}`;
+            
+            div.innerHTML = `
+                <div class="quest-info">
+                    <h3>${q.title}</h3>
+                    <p>${q.desc} (+${q.points} Poin)</p>
+                </div>
+                <div class="btn-group">
+                    ${!isDone ? `
+                        <button class="btn-done" onclick="completeQuest(${q.id},${q.points})">✅</button>
+                        <button class="btn-pass" onclick="passQuest(${q.id})">🏳️ Pass</button>
+                    ` : `<span>Selesai ✨</span>`}
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function completeQuest(id, points) {
+        score += points;
+        localStorage.setItem('coupleScore', score);
+        localStorage.setItem(`quest_${id}`, 'done');
+        renderQuests();
+    }
+
+    function passQuest(id) {
+        // Pass tidak tambah poin, tapi misi dianggap selesai biar gak jadi beban
+        localStorage.setItem(`quest_${id}`, 'passed');
+        renderQuests();
+    }
+
+    function resetGame() {
+        if(confirm("Yakin mau reset misi untuk hari baru?")) {
+            localStorage.clear();
+            score = 0;
+            renderQuests();
+        }
+    }
+
+    // Tampilkan saat pertama buka
+    renderQuests();
+</script>
+
+</body>
+</html>
